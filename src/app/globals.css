@@ -4,44 +4,53 @@
 @import "tw-animate-css";
 
 @theme {
-  --color-parchment:      #f4e4bc;
-  --color-parchment-dark: #e8d5a0;
-  --color-ink:            #3d2817;
-  --color-ink-light:      #5a3d2b;
-  --color-gold:           #d4af37;
-  --color-gold-light:     #e8c254;
-  --color-forest:         #2d4a2b;
-  --color-crimson:        #8b2635;
-  --color-tier-perfect:   #d4af37;
-  --color-tier-almost:    #6b8e3d;
-  --color-tier-partial:   #4a6fa5;
-  --color-tier-distant:   #8a8578;
+  /* Surfaces — "parchment" repurposed as dark tavern surfaces */
+  --color-parchment:      #141013;  /* page background — near-black with warm tint */
+  --color-parchment-dark: #1f1a1d;  /* elevated cards / panels */
+
+  /* Foreground — "ink" repurposed as high-contrast text on dark */
+  --color-ink:            #f5ead2;  /* primary text — ~14:1 on parchment */
+  --color-ink-light:      #c9bfa8;  /* secondary text — ~8.5:1 on parchment */
+
+  /* Accents — brightened for AA on dark */
+  --color-gold:           #f2c94c;  /* primary accent */
+  --color-gold-light:     #ffd966;  /* hover */
+  --color-forest:         #7cc47a;  /* success / positive */
+  --color-crimson:        #ef5a6a;  /* destructive / alert */
+
+  /* Tier colors — lightened to keep ≥4.5:1 on dark */
+  --color-tier-perfect:   #f2c94c;
+  --color-tier-almost:    #a4d06a;
+  --color-tier-partial:   #7aa7e0;
+  --color-tier-distant:   #b5ad9a;
 
   --font-heading: 'Cinzel', serif;
   --font-body:    'Lato', sans-serif;
 
   --background-image-parchment-texture:
-    linear-gradient(135deg, #f4e4bc 0%, #e8d5a0 100%);
+    linear-gradient(135deg, #1f1a1d 0%, #141013 100%);
 }
 
 @layer base {
+  :root { color-scheme: dark; }
+
   body {
     @apply bg-parchment text-ink font-body min-h-screen;
     background-image:
-      radial-gradient(circle at 20% 10%, rgba(212,175,55,0.08) 0%, transparent 40%),
-      radial-gradient(circle at 80% 90%, rgba(61,40,23,0.05) 0%, transparent 40%);
+      radial-gradient(circle at 20% 10%, rgba(242,201,76,0.10) 0%, transparent 45%),
+      radial-gradient(circle at 80% 90%, rgba(239,90,106,0.06) 0%, transparent 45%);
   }
 
   h1, h2, h3 { @apply font-heading text-ink; }
 }
 
 @utility adventure-card {
-  @apply bg-parchment-dark border-2 border-ink/20 rounded-lg shadow-md
-         hover:shadow-lg transition-shadow;
+  @apply bg-parchment-dark border-2 border-gold/25 rounded-lg shadow-lg
+         hover:border-gold/50 hover:shadow-xl transition-all;
 }
 
 @utility gold-button {
-  @apply bg-gold text-ink font-heading font-bold py-2 px-4 rounded
-         border-2 border-ink/30 hover:bg-gold-light transition-colors
+  @apply bg-gold text-parchment font-heading font-bold py-2 px-4 rounded
+         border-2 border-gold/60 hover:bg-gold-light transition-colors
          shadow-md active:scale-95;
 }
