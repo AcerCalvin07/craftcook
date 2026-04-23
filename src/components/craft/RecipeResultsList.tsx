@@ -3,6 +3,7 @@
 import { useCraftStore } from '@/store/craftStore'
 import { RecipeCard } from './RecipeCard'
 import type { RankedRecipe } from '@/types'
+import { RecipeCardSkeleton } from '@/components/ui/Skeleton'
 
 interface Props {
   onRecipeClick?: (ranked: RankedRecipe) => void
@@ -13,15 +14,18 @@ export const RecipeResultsList = ({ onRecipeClick }: Props) => {
   const selected  = useCraftStore(s => s.selectedIngredients)
   const isLoading = useCraftStore(s => s.isLoading)
 
-  if (isLoading) {
-    return (
-      <div className="text-center py-12 text-ink/60">
-        <div className="animate-pulse font-heading">
-          🗺️ Loading the realm's recipes...
-        </div>
+if (isLoading) {
+  return (
+    <section className="space-y-3">
+      <h2 className="font-heading text-xl font-bold">
+        🗺️ Loading the realms recipes...
+      </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {[...Array(4)].map((_, i) => <RecipeCardSkeleton key={i} />)}
       </div>
-    )
-  }
+    </section>
+  )
+}
 
   if (selected.length === 0) {
     return (

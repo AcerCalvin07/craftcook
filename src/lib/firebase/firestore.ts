@@ -57,3 +57,10 @@ export const isRecipeSaved = async (userId: string, recipeId: string) => {
   const snap = await getDoc(ref)
   return snap.exists()
 }
+
+// ── Get notes for a specific saved recipe ───────────────
+export const getRecipeNotes = async (userId: string, recipeId: string) => {
+  const ref  = doc(db, 'users', userId, 'saved_recipes', recipeId)
+  const snap = await getDoc(ref)
+  return snap.exists() ? (snap.data().notes as string) ?? '' : ''
+}

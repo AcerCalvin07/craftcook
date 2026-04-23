@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { AuthModal } from '@/components/auth/AuthModal'
+import { OfflineBanner } from '@/components/layout/OfflineBanner'
 import './globals.css'
 
 export default function RootLayout({
@@ -21,6 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <OfflineBanner />
         <main className="max-w-2xl mx-auto px-4 py-6 pb-24 min-h-screen">
           {children}
         </main>
