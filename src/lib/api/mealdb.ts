@@ -3,7 +3,7 @@ import type { Recipe } from '@/types'
 
 const BASE_URL = process.env.NEXT_PUBLIC_MEALDB_BASE_URL!
 
-const api = axios.create({ baseURL: BASE_URL })
+const api = axios.create({ baseURL: BASE_URL, timeout: 8000 })
 
 // ── Raw API Response Types ───────────────────────────────
 interface MealDBResponse {
@@ -72,6 +72,13 @@ export const filterByIngredient = async (ingredient: string) => {
   const safe = ingredient.replace(/ /g, '_')
   const { data } = await api.get<MealDBResponse>(`/filter.php?i=${safe}`)
   return data.meals ?? []   // { idMeal, strMeal, strMealThumb }
+}
+
+// Filter recipes by area (e.g. "Filipino") — returns minimal data
+export const filterByArea = async (area: string) => {
+  const safe = encodeURIComponent(area)
+  const { data } = await api.get<MealDBResponse>(`/filter.php?a=${safe}`)
+  return data.meals ?? []
 }
 
 // Get a random recipe

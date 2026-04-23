@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { useAuthStore } from '@/store/authStore'
+import { BottomNav } from '@/components/layout/BottomNav'
 import './globals.css'
 
 export default function RootLayout({
@@ -11,7 +12,6 @@ export default function RootLayout({
 }) {
   const initAuth = useAuthStore((s) => s.initAuth)
 
-  // Start listening to Firebase auth state on app load
   useEffect(() => {
     const unsubscribe = initAuth()
     return () => unsubscribe()
@@ -19,7 +19,12 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <main className="max-w-2xl mx-auto px-4 py-6 pb-24 min-h-screen">
+          {children}
+        </main>
+        <BottomNav />
+      </body>
     </html>
   )
 }

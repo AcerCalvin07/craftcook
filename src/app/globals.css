@@ -1,26 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Lato:wght@400;700&display=swap');
+
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-parchment:      #f4e4bc;
+  --color-parchment-dark: #e8d5a0;
+  --color-ink:            #3d2817;
+  --color-ink-light:      #5a3d2b;
+  --color-gold:           #d4af37;
+  --color-gold-light:     #e8c254;
+  --color-forest:         #2d4a2b;
+  --color-crimson:        #8b2635;
+  --color-tier-perfect:   #d4af37;
+  --color-tier-almost:    #6b8e3d;
+  --color-tier-partial:   #4a6fa5;
+  --color-tier-distant:   #8a8578;
+
+  --font-heading: 'Cinzel', serif;
+  --font-body:    'Lato', sans-serif;
+
+  --background-image-parchment-texture:
+    linear-gradient(135deg, #f4e4bc 0%, #e8d5a0 100%);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    @apply bg-parchment text-ink font-body min-h-screen;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(212,175,55,0.08) 0%, transparent 40%),
+      radial-gradient(circle at 80% 90%, rgba(61,40,23,0.05) 0%, transparent 40%);
   }
+
+  h1, h2, h3 { @apply font-heading text-ink; }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@utility adventure-card {
+  @apply bg-parchment-dark border-2 border-ink/20 rounded-lg shadow-md
+         hover:shadow-lg transition-shadow;
+}
+
+@utility gold-button {
+  @apply bg-gold text-ink font-heading font-bold py-2 px-4 rounded
+         border-2 border-ink/30 hover:bg-gold-light transition-colors
+         shadow-md active:scale-95;
 }

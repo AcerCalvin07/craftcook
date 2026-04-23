@@ -3,15 +3,30 @@
 import { useEffect } from 'react'
 import axios from 'axios'
 import { useCraftStore } from '@/store/craftStore'
+import { FILIPINO_RECIPES } from '@/lib/recipes/filipino'
 import type { Recipe } from '@/types'
 
-// ── Seed Ingredients — start small, add more later ──────
-const SEED_INGREDIENTS = [
-  'chicken', 'beef', 'pork',
-  'egg', 'cheese', 'milk',
-  'rice', 'flour', 'pasta',
-  'garlic', 'onion', 'tomato',
+// ── Common foreign dishes Filipinos often cook at home ──
+// Searched by name — TheMealDB's /search returns full details,
+// so no second hydrate pass is needed for these.
+const FOREIGN_DISH_NAMES = [
+  'Spaghetti Bolognese',
+  'Beef Stroganoff',
+  'Chicken Curry',
+  'Beef Stew',
+  'Fried Chicken',
+  'Pancakes',
+  'Omelette',
+  'French Toast',
+  'Beef Burger',
+  'Chicken Teriyaki',
+  'Sweet and Sour Pork',
+  'Beef Stir Fry',
+  'Fried Rice',
+  'Mac and Cheese',
 ]
+
+const normalize = (s: string) => s.toLowerCase().trim()
 
 export const useRecipeLoader = () => {
   const setCachedRecipes = useCraftStore(s => s.setCachedRecipes)
@@ -22,33 +37,29 @@ export const useRecipeLoader = () => {
       setLoading(true)
 
       try {
-        // Fetch meal IDs per ingredient
-        const mealIdSet = new Set<string>()
-        await Promise.all(
-          SEED_INGREDIENTS.map(async (ing) => {
-            const { data } = await axios.get(
-              `/api/recipes/by-ingredient?i=${ing}`
-            )
-            data.meals?.forEach((m: { idMeal: string }) =>
-              mealIdSet.add(m.idMeal)
-            )
-          })
-        )
+        const [filipinoApi, foreign] = await Promise.all([
+          loadFilipinoFromApi(),
+          loadForeignByName(),
+        ])
 
-        // Fetch full details for each unique meal
-        const ids = Array.from(mealIdSet).slice(0, 50) // cap for Phase 1
-        const recipes: Recipe[] = []
+        // Merge: local Filipino dataset first, then API Filipino, then foreign.
+        // Dedupe by normalized name so TheMealDB's "Filipino Adobo" won't
+        // double up with our "Chicken Adobo".
+        const merged: Recipe[] = []
+        const seen = new Set<string>()
 
-        await Promise.all(
-          ids.map(async (id) => {
-            const { data } = await axios.get(`/api/recipes/${id}`)
-            if (data.recipe) recipes.push(data.recipe)
-          })
-        )
+        for (const r of [...FILIPINO_RECIPES, ...filipinoApi, ...foreign]) {
+          const key = normalize(r.name)
+          if (seen.has(key)) continue
+          seen.add(key)
+          merged.push(r)
+        }
 
-        setCachedRecipes(recipes)
+        setCachedRecipes(merged)
       } catch (err) {
         console.error('Failed to load recipes:', err)
+        // Fall back to local dataset so the UI still works offline / API down.
+        setCachedRecipes(FILIPINO_RECIPES)
       } finally {
         setLoading(false)
       }
@@ -56,4 +67,37 @@ export const useRecipeLoader = () => {
 
     loadRecipes()
   }, [setCachedRecipes, setLoading])
+}
+
+// ── Helpers ─────────────────────────────────────────────
+
+const loadFilipinoFromApi = async (): Promise<Recipe[]> => {
+  try {
+    const { data } = await axios.get('/api/recipes/by-area?a=Filipino')
+    const ids: string[] = (data.meals ?? []).map((m: { idMeal: string }) => m.idMeal)
+
+    const results = await Promise.allSettled(
+      ids.map(id => axios.get(`/api/recipes/${id}`))
+    )
+    return results.flatMap(r =>
+      r.status === 'fulfilled' && r.value.data.recipe ? [r.value.data.recipe] : []
+    )
+  } catch (err) {
+    console.warn('Filipino area fetch failed:', (err as Error).message)
+    return []
+  }
+}
+
+const loadForeignByName = async (): Promise<Recipe[]> => {
+  const results = await Promise.allSettled(
+    FOREIGN_DISH_NAMES.map(name =>
+      axios.get(`/api/recipes/search?q=${encodeURIComponent(name)}`)
+    )
+  )
+  // /search returns { recipes: Recipe[] } — take the first match per query.
+  return results.flatMap(r => {
+    if (r.status !== 'fulfilled') return []
+    const recipes: Recipe[] = r.value.data.recipes ?? []
+    return recipes.length > 0 ? [recipes[0]] : []
+  })
 }

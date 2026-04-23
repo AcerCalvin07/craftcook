@@ -1,19 +1,19 @@
 import { NextResponse } from 'next/server'
-import { filterByIngredient } from '@/lib/api/mealdb'
+import { filterByArea } from '@/lib/api/mealdb'
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
-  const ingredient = searchParams.get('i') ?? ''
+  const area = searchParams.get('a') ?? ''
 
-  if (!ingredient) {
-    return NextResponse.json({ error: 'Missing ingredient' }, { status: 400 })
+  if (!area) {
+    return NextResponse.json({ error: 'Missing area' }, { status: 400 })
   }
 
   try {
-    const meals = await filterByIngredient(ingredient)
+    const meals = await filterByArea(area)
     return NextResponse.json({ meals })
   } catch (err) {
-    console.error(`[by-ingredient] ${ingredient}:`, err)
+    console.error(`[by-area] ${area}:`, err)
     return NextResponse.json(
       { error: 'Failed to filter recipes' },
       { status: 502 }
