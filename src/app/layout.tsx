@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { BottomNav } from '@/components/layout/BottomNav'
+import { AuthModal } from '@/components/auth/AuthModal'
 import './globals.css'
 
 export default function RootLayout({
@@ -24,6 +25,7 @@ export default function RootLayout({
           {children}
         </main>
         <BottomNav />
+        <AuthModal />
       </body>
     </html>
   )
